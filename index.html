@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Закрытие смены</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #f4f4f7);
+      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --text: var(--tg-theme-text-color, #1c1c1e);
+      --hint: var(--tg-theme-hint-color, #8e8e93);
+      --button: var(--tg-theme-button-color, #007aff);
+      --button-text: var(--tg-theme-button-text-color, #ffffff);
+      --border: #e5e5ea;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 14px; padding-bottom: 90px; }
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 14px; text-align: center; }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--hint);
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fafafa;
+      color: #000;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--button); background: #fff; }
+    
+    /* Toggle switch */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 28px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #e5e5ea;
+      transition: .3s;
+      border-radius: 28px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    input:checked + .slider { background-color: #34c759; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .conditional-block {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* Photo Upload Slot */
+    .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .photo-slot {
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      position: relative;
+      background: #fafafa;
+      cursor: pointer;
+    }
+    .photo-slot.has-file { border-color: #34c759; background: #f0fdf4; }
+    .photo-slot input[type="file"] { display: none; }
+    .photo-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .photo-status { font-size: 11px; color: var(--hint); }
+
+    .btn-submit {
+      position: fixed;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      background: var(--button);
+      color: var(--button-text);
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+      cursor: pointer;
+    }
+    .btn-submit:disabled { opacity: 0.6; }
+  </style>
+</head>
+<body>
+
+  <h2>Закрытие смены</h2>
+
+  <form id="shiftForm">
+    <!-- Блок Точки и Продавца -->
+    <div class="card">
+      <div class="card-title">Основное</div>
+      <div class="field">
+        <label>Магазин / Точка</label>
+        <select id="shopName" required>
+          <option value="" disabled selected>Выберите точку...</option>
+          <option value="Реутов Парк">Реутов Парк</option>
+          <option value="Павелецкая">Павелецкая</option>
+          <option value="Новокосино">Новокосино</option>
+          <!-- Добавь сюда остальные точки -->
+        </select>
+      </div>
+      <div class="field">
+        <label>Имя продавца</label>
+        <input type="text" id="sellerName" placeholder="например, Дарья" required>
+      </div>
+    </div>
+
+    <!-- Блок Сумм -->
+    <div class="card">
+      <div class="card-title">Кассовые итоги</div>
+      <div class="field">
+        <label>Итоговая выручка (руб) <span style="color:#8e8e93;">(Z-отчет / Касса)</span></label>
+        <input type="number" step="0.01" id="totalRevenue" placeholder="30179.70" required>
+      </div>
+      <div class="field">
+        <label>Сумма безнала (руб) <span style="color:#8e8e93;">(Эквайринг + СБП)</span></label>
+        <input type="number" step="0.01" id="cashlessTotal" placeholder="29979.70" required>
+      </div>
+      <div class="field">
+        <label>Сумма нала в конверте (руб)</label>
+        <input type="number" step="0.01" id="cashTotal" placeholder="200.00" required>
+      </div>
+    </div>
+
+    <!-- Блок возвратов -->
+    <div class="card">
+      <div class="toggle-row">
+        <span style="font-weight: 600; font-size: 14px;">Были возвраты за смену?</span>
+        <label class="switch">
+          <input type="checkbox" id="hasRefunds" onchange="toggleBlock('refundsBlock', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="refundsBlock" class="conditional-block">
+        <div class="field">
+          <label>Возврат наличными (руб)</label>
+          <input type="number" step="0.01" id="refundCash" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Возврат безналом (руб)</label>
+          <input type="number" step="0.01" id="refundCashless" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Блок расхода налички -->
+    <div class="card">
+      <div class="toggle-row">
+        <span style="font-weight: 600; font-size: 14px;">Был расход из кассы?</span>
+        <label class="switch">
+          <input type="checkbox" id="hasExpenses" onchange="toggleBlock('expensesBlock', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="expensesBlock" class="conditional-block">
+        <div class="field">
+          <label>Сумма расхода (руб)</label>
+          <input type="number" step="0.01" id="expenseAmount" placeholder="0">
+        </div>
+        <div class="field">
+          <label>На что расход / Комментарий</label>
+          <textarea id="expenseComment" rows="2" placeholder="Хоз. товары, вода, лента..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Фотоотчёт -->
+    <div class="card">
+      <div class="card-title">Обязательные фото (4 шт)</div>
+      <div class="photo-grid">
+        <label class="photo-slot" id="slot_zReport">
+          <div class="photo-title">1. Z-отчет</div>
+          <div class="photo-status" id="st_zReport">Нажмите для фото</div>
+          <input type="file" accept="image/*" capture="environment" id="file_zReport" onchange="handlePhoto(this, 'st_zReport', 'slot_zReport')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_terminal">
+          <div class="photo-title">2. Эквайринг</div>
+          <div class="photo-status" id="st_terminal">Нажмите для фото</div>
+          <input type="file" accept="image/*" capture="environment" id="file_terminal" onchange="handlePhoto(this, 'st_terminal', 'slot_terminal')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_kassa">
+          <div class="photo-title">3. Экран кассы</div>
+          <div class="photo-status" id="st_kassa">Нажмите для фото</div>
+          <input type="file" accept="image/*" capture="environment" id="file_kassa" onchange="handlePhoto(this, 'st_kassa', 'slot_kassa')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_envelope">
+          <div class="photo-title">4. Конверт</div>
+          <div class="photo-status" id="st_envelope">Нажмите для фото</div>
+          <input type="file" accept="image/*" capture="environment" id="file_envelope" onchange="handlePhoto(this, 'st_envelope', 'slot_envelope')" required>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">Отправить закрытие смены</button>
+  </form>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+
+    function toggleBlock(id, show) {
+      document.getElementById(id).style.display = show ? 'block' : 'none';
+    }
+
+    const photosBase64 = {};
+
+    function handlePhoto(input, statusId, slotId) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        document.getElementById(statusId).innerText = "Загружено ✓";
+        document.getElementById(slotId).classList.add('has-file');
+
+        // Сжатие фото перед отправкой
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200;
+            let width = img.width;
+            let height = img.height;
+            if (width > MAX_WIDTH) {
+              height = Math.round(height * (MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            photosBase64[input.id] = canvas.toDataURL('image/jpeg', 0.7);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Вставь сюда URL развернутого Google Apps Script
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+    document.getElementById('shiftForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "Отправка отчёта...";
+
+      const payload = {
+        date: new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' }),
+        shop: document.getElementById('shopName').value,
+        seller: document.getElementById('sellerName').value,
+        revenue: document.getElementById('totalRevenue').value,
+        cashless: document.getElementById('cashlessTotal').value,
+        cash: document.getElementById('cashTotal').value,
+        hasRefunds: document.getElementById('hasRefunds').checked,
+        refundCash: document.getElementById('refundCash').value || 0,
+        refundCashless: document.getElementById('refundCashless').value || 0,
+        hasExpenses: document.getElementById('hasExpenses').checked,
+        expenseAmount: document.getElementById('expenseAmount').value || 0,
+        expenseComment: document.getElementById('expenseComment').value || '',
+        photos: photosBase64
+      };
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("Смена успешно закрыта! Отчёт отправлен.");
+        if (tg) tg.close();
+      } catch (err) {
+        alert("Ошибка при отправке: " + err.message);
+        btn.disabled = false;
+        btn.innerText = "Отправить закрытие смены";
+      }
+    });
+  </script>
+</body>
+</html>
