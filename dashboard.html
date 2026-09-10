@@ -9,7 +9,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     
-    /* Авторизация (базовая защита от посторонних глаз) */
+    /* Авторизация */
     #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .login-box { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
     .login-box input { padding: 10px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; width: 100%; font-size: 16px; outline: none; }
@@ -22,6 +22,13 @@
     .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
     select, input[type="date"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
     
+    /* Блок статуса сдачи */
+    .completion-status { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
+    .completion-status h3 { margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .status-row { font-size: 14.5px; margin-bottom: 8px; line-height: 1.4; }
+    .status-row.success { color: #2e7d32; }
+    .status-row.error { color: #d32f2f; margin-bottom: 0; }
+
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .stat-title { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
@@ -60,9 +67,19 @@
       <input type="date" id="filterDate" onchange="renderData()">
       <select id="filterShop" onchange="renderData()">
         <option value="ALL">Все магазины</option>
-        <!-- Опции добавятся скриптом -->
       </select>
       <button onclick="loadData()" style="padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">🔄 Обновить</button>
+    </div>
+
+    <!-- Новый блок: Статус сдачи -->
+    <div class="completion-status" id="completionStatus">
+      <h3>Статус по сети за <span id="statusDateLabel"></span></h3>
+      <div class="status-row success">
+        ✅ <b>Сдали (<span id="submittedCount">0</span>/12):</b> <span id="submittedList">-</span>
+      </div>
+      <div class="status-row error">
+        ❌ <b>Ждем (<span id="pendingCount">12</span>/12):</b> <span id="pendingList">-</span>
+      </div>
     </div>
 
     <div class="stats">
@@ -95,7 +112,6 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- Строки таблицы -->
         </tbody>
       </table>
       <div id="loading">Загрузка данных из Google Таблицы...</div>
@@ -103,18 +119,33 @@
   </div>
 
   <script>
-    // ТВОЯ НОВАЯ АКТУАЛЬНАЯ ССЫЛКА НА GOOGLE APPS SCRIPT
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
     
+    // Эталонный список 12 магазинов
+    const ALL_SHOPS = [
+      "Глобус Медведково", "Европолис Вход", "Европолис Окей", 
+      "Королёв", "Котельники", "Краснодар", "Лента", 
+      "Метрополис", "Мира", "Реутов", "Трудобелики", "Южный"
+    ];
+
     let allReports = [];
     let shopsSet = new Set();
 
-    // Простой пароль для защиты страницы
     function checkPin() {
       const pin = document.getElementById('pinCode').value;
-      if (pin === '220426') {
+      if (pin === '2026') {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
+        
+        // Автоматически подставляем сегодняшнюю дату при входе
+        if (!document.getElementById('filterDate').value) {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          document.getElementById('filterDate').value = `${yyyy}-${mm}-${dd}`;
+        }
+        
         loadData();
       } else {
         alert('Неверный PIN-код');
@@ -129,11 +160,9 @@
         const res = await fetch(APPS_SCRIPT_URL);
         const data = await res.json();
         
-        // Убираем строку заголовков и переворачиваем, чтобы свежие отчеты были сверху
         const rows = data.slice(1).reverse(); 
         
         allReports = rows.map(row => {
-          // Вытаскиваем дату для фильтра (превращаем формат DD.MM.YYYY в YYYY-MM-DD)
           let dateStr = row[0] ? row[0].split(',')[0] : '';
           let isoDate = '';
           if (dateStr && dateStr.includes('.')) {
@@ -160,7 +189,6 @@
           };
         });
 
-        // Заполняем выпадающий список магазинов
         const shopSelect = document.getElementById('filterShop');
         if (shopSelect.options.length === 1) {
           Array.from(shopsSet).sort().forEach(shop => {
@@ -183,6 +211,7 @@
 
       let sumRev = 0, sumCashless = 0, sumCash = 0;
 
+      // Фильтрация для таблицы
       const filtered = allReports.filter(r => {
         if (filterDate && r.isoDate !== filterDate) return false;
         if (filterShop !== 'ALL' && r.shop !== filterShop) return false;
@@ -219,13 +248,31 @@
         `;
       });
 
-      // Обновляем плашки сумм в верхней части экрана
+      // Обновляем плашки сумм
       document.getElementById('sumRevenue').innerText = sumRev.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('sumCashless').innerText = sumCashless.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('sumCash').innerText = sumCash.toLocaleString('ru-RU') + ' ₽';
       
       if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">За выбранный период данных нет</td></tr>';
+      }
+
+      // Вычисление статуса сдачи (зависит только от выбранной даты, игнорирует фильтр магазина)
+      if (filterDate) {
+        document.getElementById('completionStatus').style.display = 'block';
+        document.getElementById('statusDateLabel').innerText = filterDate.split('-').reverse().join('.');
+        
+        const shopsForDate = new Set(allReports.filter(r => r.isoDate === filterDate).map(r => r.shop));
+        const submittedArr = Array.from(shopsForDate).filter(shop => ALL_SHOPS.includes(shop));
+        const pendingArr = ALL_SHOPS.filter(shop => !shopsForDate.has(shop));
+
+        document.getElementById('submittedCount').innerText = submittedArr.length;
+        document.getElementById('submittedList').innerText = submittedArr.length > 0 ? submittedArr.join(', ') : 'Никто не сдал';
+
+        document.getElementById('pendingCount').innerText = pendingArr.length;
+        document.getElementById('pendingList').innerText = pendingArr.length > 0 ? pendingArr.join(', ') : 'Все сдали! 🎉';
+      } else {
+        document.getElementById('completionStatus').style.display = 'none';
       }
     }
   </script>
