@@ -83,11 +83,11 @@
       height: 80px;
       object-fit: contain;
       border-radius: 6px;
-      opacity: 0.5; /* Полупрозрачные, пока не загружено своё фото */
+      opacity: 0.5;
       transition: 0.3s ease;
     }
     .photo-slot.has-file .example-img {
-      opacity: 1; /* Полностью яркие, когда продавец сделал своё фото */
+      opacity: 1;
       object-fit: cover;
     }
 
@@ -170,34 +170,34 @@
       </div>
     </div>
 
-    <!-- Фотоотчёт с примерами -->
     <div class="card">
       <div class="card-title">Обязательные фото (4 шт)</div>
       <div class="photo-grid">
         <label class="photo-slot" id="slot_zReport">
           <div class="photo-title">1. Z-отчет</div>
-          <img src="z.jpg" id="img_slot_zReport" class="example-img" alt="Пример Z">
+          <!-- Добавлен ?v=2 для сброса кэша -->
+          <img src="z.jpg?v=2" id="img_slot_zReport" class="example-img" alt="Пример Z">
           <div class="photo-status" id="st_zReport">Нажмите для фото</div>
           <input type="file" accept="image/*" capture="environment" id="file_zReport" onchange="handlePhoto(this, 'st_zReport', 'slot_zReport', 'img_slot_zReport')" required>
         </label>
 
         <label class="photo-slot" id="slot_terminal">
           <div class="photo-title">2. Эквайринг</div>
-          <img src="terminal.jpg" id="img_slot_terminal" class="example-img" alt="Пример Эквайринг">
+          <img src="terminal.jpg?v=2" id="img_slot_terminal" class="example-img" alt="Пример Эквайринг">
           <div class="photo-status" id="st_terminal">Нажмите для фото</div>
           <input type="file" accept="image/*" capture="environment" id="file_terminal" onchange="handlePhoto(this, 'st_terminal', 'slot_terminal', 'img_slot_terminal')" required>
         </label>
 
         <label class="photo-slot" id="slot_kassa">
           <div class="photo-title">3. Экран кассы</div>
-          <img src="kassa.jpg" id="img_slot_kassa" class="example-img" alt="Пример Кассы">
+          <img src="kassa.jpg?v=2" id="img_slot_kassa" class="example-img" alt="Пример Кассы">
           <div class="photo-status" id="st_kassa">Нажмите для фото</div>
           <input type="file" accept="image/*" capture="environment" id="file_kassa" onchange="handlePhoto(this, 'st_kassa', 'slot_kassa', 'img_slot_kassa')" required>
         </label>
 
         <label class="photo-slot" id="slot_envelope">
           <div class="photo-title">4. Конверт</div>
-          <img src="konvert.jpg" id="img_slot_envelope" class="example-img" alt="Пример Конверт">
+          <img src="konvert.jpg?v=2" id="img_slot_envelope" class="example-img" alt="Пример Конверт">
           <div class="photo-status" id="st_envelope">Нажмите для фото</div>
           <input type="file" accept="image/*" capture="environment" id="file_envelope" onchange="handlePhoto(this, 'st_envelope', 'slot_envelope', 'img_slot_envelope')" required>
         </label>
@@ -246,7 +246,6 @@
             const base64 = canvas.toDataURL('image/jpeg', 0.7);
             photosBase64[input.id] = base64;
             
-            // Заменяем пример на сфотканную картинку продавца
             const previewImg = document.getElementById(imgId);
             if (previewImg) {
               previewImg.src = base64;
@@ -258,7 +257,6 @@
       }
     }
 
-    // Актуальная ссылка на твой скрипт
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
 
     document.getElementById('shiftForm').addEventListener('submit', async function(e) {
