@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Дашборд управляющего</title>
+  <title>Админ Панель</title>
   <style>
     :root { --bg: #f4f6f8; --card: #ffffff; --text: #1c1c1e; --primary: #007aff; --border: #e5e5ea; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     
-    /* Авторизация */
     #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .login-box { background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
     .login-box input { padding: 10px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; width: 100%; font-size: 16px; outline: none; }
     .login-box button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; cursor: pointer; }
     
-    /* Основной интерфейс */
-    #dashboard { display: none; max-width: 1200px; margin: 0 auto; }
-    h1 { margin-bottom: 20px; font-size: 24px; }
+    #mainCabinet { display: none; max-width: 1200px; margin: 0 auto; }
     
+    /* ГЛАВНАЯ НАВИГАЦИЯ */
+    .main-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+    .main-tabs button { background: transparent; border: none; font-size: 16px; font-weight: 600; color: #8e8e93; cursor: pointer; padding: 8px 12px; border-radius: 8px; white-space: nowrap; transition: 0.2s; }
+    .main-tabs button:hover { color: #555; }
+    .main-tabs button.active { color: var(--primary); background: #e0f0ff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* =========================================
+       СТИЛИ ВКЛАДКИ 1 (ЗАКРЫТИЕ СМЕНЫ)
+       ========================================= */
     .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    select, input[type="date"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
+    select, input[type="date"], input[type="month"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
     
-    /* Блок статуса сдачи */
     .completion-status { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
     .completion-status h3 { margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .status-row { font-size: 14.5px; margin-bottom: 8px; line-height: 1.4; }
@@ -33,19 +40,58 @@
     .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .stat-title { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
     .stat-value { font-size: 24px; font-weight: 700; color: var(--primary); }
+    .stat-subtitle { font-size: 12px; color: #8e8e93; margin-top: 5px; }
 
-    /* Таблица */
+    .analytics-block { background: var(--card); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; padding: 20px; }
+    .analytics-block h3 { margin-bottom: 15px; font-size: 16px; color: var(--text); }
+    .shop-avg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+    .avg-card { background: #fafafa; border: 1px solid var(--border); padding: 12px; border-radius: 8px; }
+    .avg-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .avg-num { font-size: 16px; color: var(--primary); font-weight: 700; }
+
     .table-container { background: var(--card); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 800px; }
     th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
     th { background: #fafafa; color: #8e8e93; font-weight: 600; white-space: nowrap; }
     tr:hover { background: #f9f9f9; }
-    
     .links a { display: inline-block; margin-right: 8px; color: var(--primary); text-decoration: none; font-weight: 500; font-size: 13px; background: #e0f0ff; padding: 4px 8px; border-radius: 6px; }
     .links a:hover { background: #cce4ff; }
-    .badge { background: #ffe5e5; color: #d93025; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-block; margin-top: 4px; }
-    
     #loading { text-align: center; padding: 40px; font-size: 18px; color: #8e8e93; }
+
+    /* =========================================
+       СТИЛИ ВКЛАДКИ 2 (ОТКРЫТИЕ СМЕНЫ)
+       ========================================= */
+    .open-tabs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .open-tab-btn { padding: 10px 25px; border: none; background: #e0e0e0; color: #555; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; }
+    .open-tab-btn:hover { background: #d5d5d5; }
+    .open-tab-btn.active { background: #0d6efd; color: white; box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2); }
+    
+    .open-control-panel { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 0 auto 20px; font-size: 14px; color: #777; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); gap: 15px; }
+    .open-controls-group { display: none; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .open-update-btn { background-color: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; white-space: nowrap; }
+    .open-update-btn:hover { background-color: #555; }
+    
+    .open-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; }
+    .open-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid #e0e0e0; display: flex; flex-direction: column; }
+    .open-card.is-open { border-left-color: #198754; } 
+    
+    .open-card-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
+    .open-card-status { font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #198754; display: flex; align-items: center; gap: 5px; }
+    .open-card-status.closed { color: #dc3545; }
+    .open-card-status.archive-closed { color: #856404; }
+    .open-card-details { font-size: 13px; color: #555; margin-bottom: 20px; flex-grow: 1; line-height: 1.6; }
+    
+    .open-btn-primary { background-color: #0d6efd; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 14px; font-weight: bold; transition: 0.2s; text-align: center; }
+    .open-btn-primary:hover { background-color: #0b5ed7; }
+    .open-btn-primary:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+    .open-stats-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .open-stats-table th, .open-stats-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+    .open-stats-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
+    .open-stats-table tr:hover { background-color: #f1f4f8; }
+    .time-ok { color: #198754; font-weight: bold; }
+    .time-late { color: #dc3545; font-weight: bold; }
+    .open-btn-small { padding: 6px 12px; font-size: 12px; width: auto; }
   </style>
 </head>
 <body>
@@ -53,154 +99,221 @@
   <!-- Экран входа -->
   <div id="loginScreen">
     <div class="login-box">
-      <h2>Вход в дашборд</h2>
-      <!-- Добавлена обработка нажатия Enter -->
+      <h2>Вход в кабинет</h2>
       <input type="password" id="pinCode" placeholder="Введите PIN-код" onkeydown="if(event.key === 'Enter') checkPin()">
       <button onclick="checkPin()">Войти</button>
     </div>
   </div>
 
-  <!-- Дашборд -->
-  <div id="dashboard">
-    <h1>Отчёты по сменам</h1>
+  <!-- Главный кабинет -->
+  <div id="mainCabinet">
     
-    <div class="filters">
-      <input type="date" id="filterDate" onchange="renderData()">
-      <select id="filterShop" onchange="renderData()">
-        <option value="ALL">Все магазины</option>
-      </select>
-      <button onclick="loadData()" style="padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">🔄 Обновить</button>
+    <!-- Главная навигация -->
+    <div class="main-tabs">
+      <button class="active" onclick="switchMainTab('tab-close', this)">Закрытие смены</button>
+      <button onclick="switchMainTab('tab-open', this)">Открытие смены</button>
+      <button onclick="switchMainTab('tab-api', this)">API Статистика</button>
     </div>
 
-    <!-- Блок: Статус сдачи -->
-    <div class="completion-status" id="completionStatus">
-      <h3>Статус по сети за <span id="statusDateLabel"></span></h3>
-      <div class="status-row success">
-        ✅ <b>Сдали (<span id="submittedCount">0</span>/12):</b> <span id="submittedList">-</span>
+    <!-- =========================================
+         ВКЛАДКА 1: ЗАКРЫТИЕ СМЕНЫ
+         ========================================= -->
+    <div id="tab-close" class="tab-content active">
+      <div class="filters">
+        <input type="date" id="filterDate" onchange="renderData()">
+        <select id="filterShop" onchange="renderData()">
+          <option value="ALL">Все магазины</option>
+        </select>
+        <button onclick="loadData()" style="padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">🔄 Обновить</button>
       </div>
-      <div class="status-row error">
-        ❌ <b>Ждем (<span id="pendingCount">12</span>/12):</b> <span id="pendingList">-</span>
+
+      <div class="completion-status" id="completionStatus">
+        <h3>Статус по сети за <span id="statusDateLabel"></span></h3>
+        <div class="status-row success">✅ <b>Сдали (<span id="submittedCount">0</span>/12):</b> <span id="submittedList">-</span></div>
+        <div class="status-row error">❌ <b>Ждем (<span id="pendingCount">12</span>/12):</b> <span id="pendingList">-</span></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-title">Итоговая выручка</div>
+          <div class="stat-value" id="sumRevenue">0 ₽</div>
+          <div class="stat-subtitle" id="avgTotalRevenue">Средняя: 0 ₽</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Безнал (Терминал+СБП)</div>
+          <div class="stat-value" id="sumCashless">0 ₽</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Наличные в конвертах</div>
+          <div class="stat-value" id="sumCash">0 ₽</div>
+        </div>
+      </div>
+
+      <div class="analytics-block">
+        <h3>Средняя выручка по точкам (за выбранный период)</h3>
+        <div class="shop-avg-grid" id="shopAvgGrid"></div>
+      </div>
+
+      <div class="table-container">
+        <table id="dataTable">
+          <thead>
+            <tr>
+              <th>Дата и время</th>
+              <th>Магазин</th>
+              <th>Продавец</th>
+              <th>Выручка</th>
+              <th>Безнал</th>
+              <th>Нал</th>
+              <th>Фото чеков</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div id="loading">Загрузка данных...</div>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-title">Итоговая выручка</div>
-        <div class="stat-value" id="sumRevenue">0 ₽</div>
+    <!-- =========================================
+         ВКЛАДКА 2: ОТКРЫТИЕ СМЕНЫ
+         ========================================= -->
+    <div id="tab-open" class="tab-content">
+      
+      <!-- Внутренние вкладки открытий -->
+      <div class="open-tabs">
+        <button class="open-tab-btn active" id="open-tab-today" onclick="switchOpenTab('today')">Сегодня</button>
+        <button class="open-tab-btn" id="open-tab-archive" onclick="switchOpenTab('archive')">Архив по датам</button>
+        <button class="open-tab-btn" id="open-tab-stats" onclick="switchOpenTab('stats')">Статистика</button>
       </div>
-      <div class="stat-card">
-        <div class="stat-title">Безнал (Терминал+СБП)</div>
-        <div class="stat-value" id="sumCashless">0 ₽</div>
+      
+      <!-- Панель управления открытиями -->
+      <div class="open-control-panel">
+        <span id="open-last-update">Последнее обновление: ожидание...</span>
+        
+        <div class="open-controls-group" id="open-date-controls">
+          <label for="open-history-date"><strong>Выберите дату:</strong></label>
+          <input type="date" id="open-history-date" onchange="renderOpenDashboard()">
+        </div>
+
+        <div class="open-controls-group" id="open-stats-controls">
+          <label for="open-stats-month"><strong>Месяц:</strong></label>
+          <input type="month" id="open-stats-month" onchange="renderOpenDashboard()">
+          
+          <label for="open-stats-shop"><strong>Магазин:</strong></label>
+          <select id="open-stats-shop" onchange="renderOpenDashboard()">
+            <option value="all">Все магазины</option>
+            <option value="Медведково">Медведково</option>
+            <option value="Трудобелики">Трудобелики</option>
+            <option value="Котельники">Котельники</option>
+            <option value="Королёв">Королёв</option>
+            <option value="Южный">Южный</option>
+            <option value="Лента">Лента</option>
+            <option value="Мира">Мира</option>
+            <option value="Краснодар">Краснодар</option>
+            <option value="Реутов">Реутов</option>
+            <option value="Метрополис">Метрополис</option>
+            <option value="Европолис Вход">Европолис Вход</option>
+            <option value="Европолис Окей">Европолис Окей</option>
+          </select>
+        </div>
+
+        <button class="open-update-btn" onclick="fetchOpenData()">Обновить данные</button>
       </div>
-      <div class="stat-card">
-        <div class="stat-title">Наличные в конвертах</div>
-        <div class="stat-value" id="sumCash">0 ₽</div>
+      
+      <!-- Контейнер для карточек / таблицы открытий -->
+      <div id="open-dashboard-container" class="open-grid"></div>
+
+    </div>
+
+    <!-- =========================================
+         ВКЛАДКА 3: API СТАТИСТИКА
+         ========================================= -->
+    <div id="tab-api" class="tab-content">
+      <div class="analytics-block">
+        <h3>Ожидание кода API</h3>
+        <p style="color: #8e8e93;">Сюда будет интегрирована статистика по API. Пришли мне код, и я добавлю его сюда!</p>
       </div>
     </div>
 
-    <div class="table-container">
-      <table id="dataTable">
-        <thead>
-          <tr>
-            <th>Дата и время</th>
-            <th>Магазин</th>
-            <th>Продавец</th>
-            <th>Выручка</th>
-            <th>Безнал</th>
-            <th>Нал</th>
-            <th>Расходы / Возвраты</th>
-            <th>Чеки (Фото)</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-      </table>
-      <div id="loading">Загрузка данных из Google Таблицы...</div>
-    </div>
   </div>
 
+  <!-- =========================================
+       JAVASCRIPT ЛОГИКА
+       ========================================= -->
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
-    
-    // Эталонный список 12 магазинов
-    const ALL_SHOPS = [
-      "Глобус Медведково", "Европолис Вход", "Европолис Окей", 
-      "Королёв", "Котельники", "Краснодар", "Лента", 
-      "Метрополис", "Мира", "Реутов", "Трудобелики", "Южный"
-    ];
-
-    let allReports = [];
-    let shopsSet = new Set();
+    // --- 1. ОБЩИЕ ФУНКЦИИ ---
+    function switchMainTab(tabId, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.main-tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+    }
 
     function checkPin() {
-      const pin = document.getElementById('pinCode').value;
-      // PIN-код изменен на 220426
-      if (pin === '220426') {
+      if (document.getElementById('pinCode').value === '220426') {
         document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('mainCabinet').style.display = 'block';
         
-        // Автоматически подставляем сегодняшнюю дату при входе
+        // Установка дат по умолчанию для Закрытий
         if (!document.getElementById('filterDate').value) {
           const d = new Date();
-          const yyyy = d.getFullYear();
-          const mm = String(d.getMonth() + 1).padStart(2, '0');
-          const dd = String(d.getDate()).padStart(2, '0');
-          document.getElementById('filterDate').value = `${yyyy}-${mm}-${dd}`;
+          document.getElementById('filterDate').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
         
-        loadData();
+        // Запуск загрузки обеих баз
+        loadData();      // Загрузка Закрытий
+        fetchOpenData(); // Загрузка Открытий
       } else {
         alert('Неверный PIN-код');
       }
     }
 
+    // --- 2. ЛОГИКА "ЗАКРЫТИЕ СМЕНЫ" ---
+    const APPS_SCRIPT_URL_CLOSE = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
+    const ALL_SHOPS_CLOSE = ["Глобус Медведково", "Европолис Вход", "Европолис Окей", "Королёв", "Котельники", "Краснодар", "Лента", "Метрополис", "Мира", "Реутов", "Трудобелики", "Южный"];
+    let allCloseReports = [];
+    let closeShopsSet = new Set();
+
+    function parseMoney(val) {
+      if (!val) return 0;
+      let s = String(val).replace(/\s/g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+      return parseFloat(s) || 0;
+    }
+
     async function loadData() {
       document.getElementById('loading').style.display = 'block';
-      document.getElementById('tableBody').innerHTML = '';
-      
       try {
-        const res = await fetch(APPS_SCRIPT_URL);
+        const res = await fetch(APPS_SCRIPT_URL_CLOSE);
         const data = await res.json();
-        
         const rows = data.slice(1).reverse(); 
         
-        allReports = rows.map(row => {
+        allCloseReports = rows.map(row => {
           let dateStr = row[0] ? row[0].split(',')[0] : '';
           let isoDate = '';
           if (dateStr && dateStr.includes('.')) {
-            const parts = dateStr.split('.');
-            isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            const p = dateStr.split('.');
+            isoDate = `${p[2]}-${p[1]}-${p[0]}`;
           }
-
-          if (row[1]) shopsSet.add(row[1]);
+          if (row[1]) closeShopsSet.add(row[1]);
 
           return {
-            fullDate: row[0],
-            isoDate: isoDate,
-            shop: row[1],
-            seller: row[2],
-            revenue: parseFloat(String(row[3]).replace(/[^\d.-]/g, '')) || 0,
-            cashless: parseFloat(String(row[4]).replace(/[^\d.-]/g, '')) || 0,
-            cash: parseFloat(String(row[5]).replace(/[^\d.-]/g, '')) || 0,
-            refunds: row[6],
-            expenses: row[7],
-            photoZ: row[8],
-            photoTerm: row[9],
-            photoKassa: row[10],
-            photoEnv: row[11]
+            fullDate: row[0], isoDate: isoDate, shop: row[1], seller: row[2],
+            revenue: parseMoney(row[3]),
+            cashless: parseMoney(row[4]),
+            cash: parseMoney(row[5]),
+            refunds: row[6], expenses: row[7],
+            photoZ: row[8], photoTerm: row[9], photoKassa: row[10], photoEnv: row[11]
           };
         });
 
         const shopSelect = document.getElementById('filterShop');
         if (shopSelect.options.length === 1) {
-          Array.from(shopsSet).sort().forEach(shop => {
-            if (shop) shopSelect.innerHTML += `<option value="${shop}">${shop}</option>`;
+          Array.from(closeShopsSet).sort().forEach(s => {
+            if (s) shopSelect.innerHTML += `<option value="${s}">${s}</option>`;
           });
         }
-
         renderData();
       } catch (err) {
-        document.getElementById('loading').innerText = 'Ошибка загрузки: ' + err.message;
+        document.getElementById('loading').innerText = 'Ошибка: ' + err.message;
       }
     }
 
@@ -212,9 +325,9 @@
       tbody.innerHTML = '';
 
       let sumRev = 0, sumCashless = 0, sumCash = 0;
+      let shopAverages = {};
 
-      // Фильтрация для таблицы
-      const filtered = allReports.filter(r => {
+      const filtered = allCloseReports.filter(r => {
         if (filterDate && r.isoDate !== filterDate) return false;
         if (filterShop !== 'ALL' && r.shop !== filterShop) return false;
         return true;
@@ -225,58 +338,242 @@
         sumCashless += r.cashless;
         sumCash += r.cash;
 
-        let extraHtml = '';
-        if (r.expenses && r.expenses !== 'Нет') extraHtml += `<div class="badge">Расход: ${r.expenses}</div><br>`;
-        if (r.refunds && r.refunds !== 'Нет') extraHtml += `<div class="badge" style="background:#fff3e0; color:#e65100;">Возврат: ${r.refunds}</div>`;
+        if (!shopAverages[r.shop]) shopAverages[r.shop] = { sum: 0, count: 0 };
+        shopAverages[r.shop].sum += r.revenue;
+        shopAverages[r.shop].count += 1;
 
         let linksHtml = '<div class="links">';
         if (r.photoZ) linksHtml += `<a href="${r.photoZ}" target="_blank">Z-отчет</a>`;
         if (r.photoTerm) linksHtml += `<a href="${r.photoTerm}" target="_blank">Терминал</a>`;
         if (r.photoKassa) linksHtml += `<a href="${r.photoKassa}" target="_blank">Касса</a>`;
-        if (r.photoEnv) linksHtml += `<a href="${r.photoEnv}" target="_blank">Конверт</a>`;
+        if (r.photoEnv && r.photoEnv !== 'Нет фото') linksHtml += `<a href="${r.photoEnv}" target="_blank">Конверт</a>`;
         linksHtml += '</div>';
 
-        tbody.innerHTML += `
-          <tr>
+        tbody.innerHTML += `<tr>
             <td>${r.fullDate || '-'}</td>
             <td style="font-weight:600;">${r.shop || '-'}</td>
             <td>${r.seller || '-'}</td>
-            <td style="font-weight:600;">${r.revenue.toLocaleString('ru-RU')} ₽</td>
-            <td>${r.cashless.toLocaleString('ru-RU')} ₽</td>
-            <td>${r.cash.toLocaleString('ru-RU')} ₽</td>
-            <td>${extraHtml || '-'}</td>
+            <td style="font-weight:600;">${Math.round(r.revenue).toLocaleString('ru-RU')} ₽</td>
+            <td>${Math.round(r.cashless).toLocaleString('ru-RU')} ₽</td>
+            <td>${Math.round(r.cash).toLocaleString('ru-RU')} ₽</td>
             <td>${linksHtml}</td>
-          </tr>
-        `;
+          </tr>`;
       });
 
-      // Обновляем плашки сумм
-      document.getElementById('sumRevenue').innerText = sumRev.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('sumCashless').innerText = sumCashless.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('sumCash').innerText = sumCash.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('sumRevenue').innerText = Math.round(sumRev).toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('sumCashless').innerText = Math.round(sumCashless).toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('sumCash').innerText = Math.round(sumCash).toLocaleString('ru-RU') + ' ₽';
       
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">За выбранный период данных нет</td></tr>';
+      let avgTotal = filtered.length > 0 ? sumRev / filtered.length : 0;
+      document.getElementById('avgTotalRevenue').innerText = `Средняя: ${Math.round(avgTotal).toLocaleString('ru-RU')} ₽`;
+      
+      if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Нет данных</td></tr>';
+
+      const grid = document.getElementById('shopAvgGrid');
+      grid.innerHTML = '';
+      for (let shop in shopAverages) {
+        let avg = shopAverages[shop].sum / shopAverages[shop].count;
+        grid.innerHTML += `<div class="avg-card"><div class="avg-name">${shop}</div><div class="avg-num">${Math.round(avg).toLocaleString('ru-RU')} ₽</div></div>`;
       }
 
-      // Вычисление статуса сдачи (зависит только от выбранной даты, игнорирует фильтр магазина)
       if (filterDate) {
         document.getElementById('completionStatus').style.display = 'block';
         document.getElementById('statusDateLabel').innerText = filterDate.split('-').reverse().join('.');
-        
-        const shopsForDate = new Set(allReports.filter(r => r.isoDate === filterDate).map(r => r.shop));
-        const submittedArr = Array.from(shopsForDate).filter(shop => ALL_SHOPS.includes(shop));
-        const pendingArr = ALL_SHOPS.filter(shop => !shopsForDate.has(shop));
-
+        const shopsForDate = new Set(allCloseReports.filter(r => r.isoDate === filterDate).map(r => r.shop));
+        const submittedArr = Array.from(shopsForDate).filter(shop => ALL_SHOPS_CLOSE.includes(shop));
+        const pendingArr = ALL_SHOPS_CLOSE.filter(shop => !shopsForDate.has(shop));
         document.getElementById('submittedCount').innerText = submittedArr.length;
         document.getElementById('submittedList').innerText = submittedArr.length > 0 ? submittedArr.join(', ') : 'Никто не сдал';
-
         document.getElementById('pendingCount').innerText = pendingArr.length;
         document.getElementById('pendingList').innerText = pendingArr.length > 0 ? pendingArr.join(', ') : 'Все сдали! 🎉';
       } else {
         document.getElementById('completionStatus').style.display = 'none';
       }
     }
+
+    // --- 3. ЛОГИКА "ОТКРЫТИЕ СМЕНЫ" ---
+    const APPS_SCRIPT_URL_OPEN = "https://script.google.com/macros/s/AKfycbxNQKdlCGzNCznsXEMR2zOM0_BX2cAuOk29mWYRO7XSrzVLPGKfkMtOey6iuPxrdm5P/exec"; 
+    
+    const openSchedule = {
+      "Медведково": "08:00", "Трудобелики": "09:00", "Котельники": "09:00", "Королёв": "09:00",
+      "Южный": "09:00", "Лента": "09:00", "Мира": "09:00", "Краснодар": "09:00",
+      "Реутов": "10:00", "Метрополис": "10:00", "Европолис Вход": "10:00", "Европолис Окей": "10:00"
+    };
+
+    let allOpenData = []; 
+    let currentOpenMode = 'today'; 
+
+    // Инициализация дат для Открытий
+    const todayObjForInput = new Date();
+    const yyyy = todayObjForInput.getFullYear();
+    const mm = String(todayObjForInput.getMonth() + 1).padStart(2, '0');
+    const dd = String(todayObjForInput.getDate()).padStart(2, '0');
+    
+    document.getElementById('open-history-date').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('open-stats-month').value = `${yyyy}-${mm}`;
+
+    function switchOpenTab(mode) {
+      currentOpenMode = mode;
+      
+      document.getElementById('open-tab-today').classList.toggle('active', mode === 'today');
+      document.getElementById('open-tab-archive').classList.toggle('active', mode === 'archive');
+      document.getElementById('open-tab-stats').classList.toggle('active', mode === 'stats');
+      
+      document.getElementById('open-date-controls').style.display = (mode === 'archive') ? 'flex' : 'none';
+      document.getElementById('open-stats-controls').style.display = (mode === 'stats') ? 'flex' : 'none';
+      
+      renderOpenDashboard();
+    }
+
+    async function fetchOpenData() {
+      document.getElementById('open-last-update').innerText = "Синхронизация...";
+      try {
+        const response = await fetch(APPS_SCRIPT_URL_OPEN);
+        allOpenData = await response.json(); 
+        
+        const now = new Date();
+        document.getElementById('open-last-update').innerText = "Синхронизировано: " + now.toLocaleTimeString('ru-RU');
+        
+        renderOpenDashboard();
+      } catch (error) {
+        document.getElementById('open-last-update').innerText = "Ошибка сети (Открытия).";
+      }
+    }
+
+    function renderOpenDashboard() {
+      const openDashboard = document.getElementById('open-dashboard-container');
+      openDashboard.innerHTML = "";
+
+      // ТАБЛИЦА СТАТИСТИКИ ОТКРЫТИЙ
+      if (currentOpenMode === 'stats') {
+        openDashboard.className = "table-container"; 
+        
+        const monthVal = document.getElementById('open-stats-month').value; 
+        const shopVal = document.getElementById('open-stats-shop').value;
+        
+        let filteredData = allOpenData;
+        
+        if (monthVal) {
+          const parts = monthVal.split('-');
+          const suffix = `${parts[1]}.${parts[0]}`; 
+          filteredData = filteredData.filter(row => row[0].endsWith(suffix));
+        }
+        
+        if (shopVal !== 'all') {
+          filteredData = filteredData.filter(row => row[2] === shopVal);
+        }
+
+        if (filteredData.length === 0) {
+          openDashboard.innerHTML = "<div style='padding: 30px; text-align: center; color: #777;'>В этом месяце открытий пока не зафиксировано.</div>";
+          return;
+        }
+
+        let html = `
+          <table class="open-stats-table">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Магазин</th>
+                <th>Сотрудник</th>
+                <th>Время открытия</th>
+                <th>Фото чека</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        for (let i = filteredData.length - 1; i >= 0; i--) {
+          const row = filteredData[i];
+          const dateStr = row[0];
+          const timeStr = row[1];
+          const shopName = row[2];
+          const photoUrl = row[4];
+          const employee = row[5] || "Не указан";
+          
+          const expectedTime = openSchedule[shopName];
+          let timeClass = "time-ok";
+          
+          if (timeStr && expectedTime && timeStr > expectedTime) {
+            timeClass = "time-late";
+          }
+
+          html += `
+            <tr>
+              <td>${dateStr}</td>
+              <td><b>${shopName}</b></td>
+              <td>${employee}</td>
+              <td class="${timeClass}">${timeStr} <span style="color:#999; font-size:11px; font-weight:normal;">(норма ${expectedTime})</span></td>
+              <td><button class="open-btn-primary open-btn-small" onclick="window.open('${photoUrl}', '_blank')">Смотреть</button></td>
+            </tr>
+          `;
+        }
+        
+        html += `</tbody></table>`;
+        openDashboard.innerHTML = html;
+        return;
+      }
+
+      // КАРТОЧКИ (СЕГОДНЯ / АРХИВ)
+      openDashboard.className = "open-grid"; 
+      
+      let targetDateStr = "";
+      if (currentOpenMode === 'today') {
+        const todayObj = new Date();
+        const day = String(todayObj.getDate()).padStart(2, '0');
+        const month = String(todayObj.getMonth() + 1).padStart(2, '0');
+        const year = todayObj.getFullYear();
+        targetDateStr = `${day}.${month}.${year}`;
+      } else {
+        const inputVal = document.getElementById('open-history-date').value;
+        if (!inputVal) return; 
+        const parts = inputVal.split('-'); 
+        targetDateStr = `${parts[2]}.${parts[1]}.${parts[0]}`;
+      }
+      
+      const targetData = allOpenData.filter(row => row[0] === targetDateStr);
+      
+      Object.keys(openSchedule).forEach(shop => {
+        const shopLog = targetData.reverse().find(row => row[2] === shop); 
+        
+        const card = document.createElement('div');
+        card.className = "open-card" + (shopLog ? " is-open" : "");
+        
+        let statusHtml = "";
+        let detailsHtml = "";
+        let btnHtml = "";
+        
+        if (shopLog) {
+          statusHtml = `<div class="open-card-status">☑️ Открыт в ${shopLog[1]}</div>`;
+          detailsHtml = `Сотрудник: <b>${shopLog[5]}</b><br>По графику: ${openSchedule[shop]}`;
+          btnHtml = `<button class="open-btn-primary" onclick="window.open('${shopLog[4]}', '_blank')">Посмотреть чек</button>`;
+        } else {
+          if (currentOpenMode === 'today') {
+            statusHtml = `<div class="open-card-status closed">❌ Ждем открытия</div>`;
+            detailsHtml = `Сотрудник: —<br>По графику: ${openSchedule[shop]}`;
+          } else {
+            statusHtml = `<div class="open-card-status archive-closed">⚠️ Нет данных</div>`;
+            detailsHtml = `Открытие не зафиксировано<br>По графику: ${openSchedule[shop]}`;
+          }
+          btnHtml = `<button class="open-btn-primary" disabled>Чек отсутствует</button>`;
+        }
+        
+        card.innerHTML = `
+          <div class="open-card-title">${shop}</div>
+          ${statusHtml}
+          <div class="open-card-details">${detailsHtml}</div>
+          ${btnHtml}
+        `;
+        openDashboard.appendChild(card);
+      });
+    }
+
+    // Автообновление данных по Открытиям раз в 2 минуты
+    setInterval(() => {
+      if(document.getElementById('mainCabinet').style.display === 'block') {
+         fetchOpenData();
+      }
+    }, 120000);
+
   </script>
 </body>
 </html>
