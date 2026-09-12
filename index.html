@@ -23,6 +23,7 @@
     input:checked + .slider { background-color: #34c759; } input:checked + .slider:before { transform: translateX(20px); }
     .conditional-block { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
     .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    
     .photo-slot { border: 1.5px dashed var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; position: relative; background: #fafafa; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
     .photo-slot.has-file { border-color: #34c759; background: #f0fdf4; border-style: solid; }
     .photo-slot input[type="file"] { display: none; }
@@ -30,6 +31,11 @@
     .photo-status { font-size: 11px; color: var(--hint); margin-top: 6px; }
     .example-img { width: 100%; height: 80px; object-fit: contain; border-radius: 6px; opacity: 0.5; transition: 0.3s ease; }
     .photo-slot.has-file .example-img { opacity: 1; object-fit: cover; }
+    
+    /* Кнопка поворота фото */
+    .rotate-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 18px; z-index: 5; pointer-events: auto; }
+    .rotate-btn:hover { background: rgba(0,0,0,0.8); }
+
     .btn-submit { position: fixed; bottom: 12px; left: 14px; right: 14px; background: var(--button); color: var(--button-text); font-size: 16px; font-weight: 600; border: none; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); cursor: pointer; z-index: 10; }
     .btn-submit:disabled { opacity: 0.6; }
     .calc-hint { font-size: 11px; color: #8e8e93; font-weight: normal; }
@@ -87,10 +93,37 @@
     <div class="card">
       <div class="card-title">Обязательные фото</div>
       <div class="photo-grid">
-        <label class="photo-slot" id="slot_zReport"><div class="photo-title">1. Z-отчет</div><img src="z.jpg?v=2" id="img_slot_zReport" class="example-img"><div class="photo-status" id="st_zReport">Нажмите для фото</div><input type="file" accept="image/*" id="file_zReport" onchange="handlePhoto(this, 'st_zReport', 'slot_zReport', 'img_slot_zReport')" required></label>
-        <label class="photo-slot" id="slot_terminal"><div class="photo-title">2. Эквайринг</div><img src="terminal.jpg?v=2" id="img_slot_terminal" class="example-img"><div class="photo-status" id="st_terminal">Нажмите для фото</div><input type="file" accept="image/*" id="file_terminal" onchange="handlePhoto(this, 'st_terminal', 'slot_terminal', 'img_slot_terminal')" required></label>
-        <label class="photo-slot" id="slot_kassa"><div class="photo-title">3. Экран кассы</div><img src="kassa.jpg?v=2" id="img_slot_kassa" class="example-img"><div class="photo-status" id="st_kassa">Нажмите для фото</div><input type="file" accept="image/*" id="file_kassa" onchange="handlePhoto(this, 'st_kassa', 'slot_kassa', 'img_slot_kassa')" required></label>
-        <label class="photo-slot" id="slot_envelope"><div class="photo-title">4. Конверт</div><img src="konvert.jpg?v=2" id="img_slot_envelope" class="example-img"><div class="photo-status" id="st_envelope">Нажмите для фото</div><input type="file" accept="image/*" id="file_envelope" onchange="handlePhoto(this, 'st_envelope', 'slot_envelope', 'img_slot_envelope')" required></label>
+        <label class="photo-slot" id="slot_zReport">
+          <div class="rotate-btn" id="rot_zReport" onclick="rotateImage(event, 'file_zReport', 'img_slot_zReport')">↻</div>
+          <div class="photo-title">1. Z-отчет</div>
+          <img src="z.jpg?v=2" id="img_slot_zReport" class="example-img">
+          <div class="photo-status" id="st_zReport">Нажмите для фото</div>
+          <input type="file" accept="image/*" id="file_zReport" onchange="handlePhoto(this, 'st_zReport', 'slot_zReport', 'img_slot_zReport', 'rot_zReport')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_terminal">
+          <div class="rotate-btn" id="rot_terminal" onclick="rotateImage(event, 'file_terminal', 'img_slot_terminal')">↻</div>
+          <div class="photo-title">2. Эквайринг</div>
+          <img src="terminal.jpg?v=2" id="img_slot_terminal" class="example-img">
+          <div class="photo-status" id="st_terminal">Нажмите для фото</div>
+          <input type="file" accept="image/*" id="file_terminal" onchange="handlePhoto(this, 'st_terminal', 'slot_terminal', 'img_slot_terminal', 'rot_terminal')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_kassa">
+          <div class="rotate-btn" id="rot_kassa" onclick="rotateImage(event, 'file_kassa', 'img_slot_kassa')">↻</div>
+          <div class="photo-title">3. Экран кассы</div>
+          <img src="kassa.jpg?v=2" id="img_slot_kassa" class="example-img">
+          <div class="photo-status" id="st_kassa">Нажмите для фото</div>
+          <input type="file" accept="image/*" id="file_kassa" onchange="handlePhoto(this, 'st_kassa', 'slot_kassa', 'img_slot_kassa', 'rot_kassa')" required>
+        </label>
+
+        <label class="photo-slot" id="slot_envelope">
+          <div class="rotate-btn" id="rot_envelope" onclick="rotateImage(event, 'file_envelope', 'img_slot_envelope')">↻</div>
+          <div class="photo-title">4. Конверт</div>
+          <img src="konvert.jpg?v=2" id="img_slot_envelope" class="example-img">
+          <div class="photo-status" id="st_envelope">Нажмите для фото</div>
+          <input type="file" accept="image/*" id="file_envelope" onchange="handlePhoto(this, 'st_envelope', 'slot_envelope', 'img_slot_envelope', 'rot_envelope')" required>
+        </label>
       </div>
     </div>
     <button type="submit" class="btn-submit" id="submitBtn">Отправить закрытие смены</button>
@@ -109,7 +142,7 @@
       if (val === 0) {
         envSlot.style.display = 'none';
         envInput.required = false;
-        photosBase64['file_envelope'] = null; // Очищаем, если было загружено
+        photosBase64['file_envelope'] = null; 
       } else {
         envSlot.style.display = 'flex';
         envInput.required = true;
@@ -117,59 +150,72 @@
     }
 
     const photosBase64 = {};
+    const originalImages = {};
+    const currentRotations = {};
 
-    function handlePhoto(input, statusId, slotId, imgId) {
+    function handlePhoto(input, statusId, slotId, imgId, btnId) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
         document.getElementById(statusId).innerText = "Загружено ✓";
         document.getElementById(slotId).classList.add('has-file');
+        document.getElementById(btnId).style.display = 'flex'; // Показываем крутилку
 
         const reader = new FileReader();
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 1200;
-            let width = img.width;
-            let height = img.height;
-            
-            // ПЕРЕВОРОТ ГОРИЗОНТАЛЬНЫХ ФОТО
-            let isHorizontal = width > height;
-            let scale = 1;
-            
-            if (isHorizontal) {
-              if (height > MAX_WIDTH) scale = MAX_WIDTH / height;
-            } else {
-              if (width > MAX_WIDTH) scale = MAX_WIDTH / width;
-            }
-
-            width = Math.round(width * scale);
-            height = Math.round(height * scale);
-
-            const ctx = canvas.getContext('2d');
-            
-            if (isHorizontal) {
-              canvas.width = height; 
-              canvas.height = width;
-              ctx.translate(canvas.width/2, canvas.height/2);
-              ctx.rotate(Math.PI / 2);
-              ctx.drawImage(img, -width/2, -height/2, width, height);
-            } else {
-              canvas.width = width;
-              canvas.height = height;
-              ctx.drawImage(img, 0, 0, width, height);
-            }
-            
-            const base64 = canvas.toDataURL('image/jpeg', 0.7);
-            photosBase64[input.id] = base64;
-            
-            const previewImg = document.getElementById(imgId);
-            if (previewImg) previewImg.src = base64;
+            originalImages[input.id] = img; // Сохраняем оригинал для вращения
+            currentRotations[input.id] = 0; // Сбрасываем угол
+            applyRotation(input.id, imgId); // Отрисовываем
           };
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
       }
+    }
+
+    function rotateImage(event, inputId, imgId) {
+      event.preventDefault(); 
+      event.stopPropagation(); // Чтобы при клике на крутилку не открывалась галерея
+      
+      if (!originalImages[inputId]) return;
+      currentRotations[inputId] = (currentRotations[inputId] + 90) % 360; // Добавляем 90 градусов
+      applyRotation(inputId, imgId);
+    }
+
+    function applyRotation(inputId, imgId) {
+      const img = originalImages[inputId];
+      const angle = currentRotations[inputId];
+      const canvas = document.createElement('canvas');
+      
+      const MAX_WIDTH = 1200;
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > MAX_WIDTH || height > MAX_WIDTH) {
+        let scale = Math.min(MAX_WIDTH / width, MAX_WIDTH / height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+
+      if (angle === 90 || angle === 270) {
+        canvas.width = height;
+        canvas.height = width;
+      } else {
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      const ctx = canvas.getContext('2d');
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((angle * Math.PI) / 180);
+      ctx.drawImage(img, -width / 2, -height / 2, width, height);
+
+      const finalBase64 = canvas.toDataURL('image/jpeg', 0.8);
+      photosBase64[inputId] = finalBase64;
+      
+      const previewImg = document.getElementById(imgId);
+      if (previewImg) previewImg.src = finalBase64;
     }
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
@@ -180,7 +226,6 @@
       btn.disabled = true;
       btn.innerText = "Отправка отчёта...";
 
-      // Логика математики (вычет возвратов)
       let finalRev = parseFloat(document.getElementById('totalRevenue').value) || 0;
       let finalCashless = parseFloat(document.getElementById('cashlessTotal').value) || 0;
       const refC = parseFloat(document.getElementById('refundCash').value) || 0;
