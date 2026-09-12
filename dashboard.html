@@ -25,17 +25,13 @@
     .tab-content.active { display: block; }
 
     /* =========================================
-       СТИЛИ ВКЛАДКИ 1 (ЗАКРЫТИЕ СМЕНЫ)
+       ОБЩИЕ СТИЛИ (ФИЛЬТРЫ, СТАТИСТИКА, ТАБЛИЦЫ)
        ========================================= */
-    .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
     select, input[type="date"], input[type="month"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
+    .update-btn { padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; transition: 0.2s; }
+    .update-btn:hover { background: #f0f0f0; }
     
-    .completion-status { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
-    .completion-status h3 { margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    .status-row { font-size: 14.5px; margin-bottom: 8px; line-height: 1.4; }
-    .status-row.success { color: #2e7d32; }
-    .status-row.error { color: #d32f2f; margin-bottom: 0; }
-
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .stat-title { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
@@ -56,7 +52,14 @@
     tr:hover { background: #f9f9f9; }
     .links a { display: inline-block; margin-right: 8px; color: var(--primary); text-decoration: none; font-weight: 500; font-size: 13px; background: #e0f0ff; padding: 4px 8px; border-radius: 6px; }
     .links a:hover { background: #cce4ff; }
-    #loading { text-align: center; padding: 40px; font-size: 18px; color: #8e8e93; }
+    .loading-msg { text-align: center; padding: 40px; font-size: 18px; color: #8e8e93; display: none; }
+
+    /* Статусы сдачи (Вкладка 1) */
+    .completion-status { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
+    .completion-status h3 { margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .status-row { font-size: 14.5px; margin-bottom: 8px; line-height: 1.4; }
+    .status-row.success { color: #2e7d32; }
+    .status-row.error { color: #d32f2f; margin-bottom: 0; }
 
     /* =========================================
        СТИЛИ ВКЛАДКИ 2 (ОТКРЫТИЕ СМЕНЫ)
@@ -66,29 +69,17 @@
     .open-tab-btn:hover { background: #d5d5d5; }
     .open-tab-btn.active { background: #0d6efd; color: white; box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2); }
     
-    .open-control-panel { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 0 auto 20px; font-size: 14px; color: #777; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); gap: 15px; }
-    .open-controls-group { display: none; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .open-update-btn { background-color: #333; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; white-space: nowrap; }
-    .open-update-btn:hover { background-color: #555; }
-    
     .open-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; }
     .open-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid #e0e0e0; display: flex; flex-direction: column; }
     .open-card.is-open { border-left-color: #198754; } 
-    
     .open-card-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; }
     .open-card-status { font-size: 15px; font-weight: bold; margin-bottom: 15px; color: #198754; display: flex; align-items: center; gap: 5px; }
     .open-card-status.closed { color: #dc3545; }
     .open-card-status.archive-closed { color: #856404; }
     .open-card-details { font-size: 13px; color: #555; margin-bottom: 20px; flex-grow: 1; line-height: 1.6; }
-    
     .open-btn-primary { background-color: #0d6efd; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 14px; font-weight: bold; transition: 0.2s; text-align: center; }
     .open-btn-primary:hover { background-color: #0b5ed7; }
     .open-btn-primary:disabled { background-color: #cccccc; cursor: not-allowed; }
-
-    .open-stats-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    .open-stats-table th, .open-stats-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-    .open-stats-table th { background-color: #f8f9fa; font-weight: bold; color: #333; }
-    .open-stats-table tr:hover { background-color: #f1f4f8; }
     .time-ok { color: #198754; font-weight: bold; }
     .time-late { color: #dc3545; font-weight: bold; }
     .open-btn-small { padding: 6px 12px; font-size: 12px; width: auto; }
@@ -112,7 +103,7 @@
     <div class="main-tabs">
       <button class="active" onclick="switchMainTab('tab-close', this)">Закрытие смены</button>
       <button onclick="switchMainTab('tab-open', this)">Открытие смены</button>
-      <button onclick="switchMainTab('tab-api', this)">API Статистика</button>
+      <button onclick="switchMainTab('tab-api', this)">API LiteBox</button>
     </div>
 
     <!-- =========================================
@@ -124,7 +115,7 @@
         <select id="filterShop" onchange="renderData()">
           <option value="ALL">Все магазины</option>
         </select>
-        <button onclick="loadData()" style="padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">🔄 Обновить</button>
+        <button class="update-btn" onclick="loadData()">🔄 Обновить</button>
       </div>
 
       <div class="completion-status" id="completionStatus">
@@ -169,7 +160,7 @@
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
-        <div id="loading">Загрузка данных...</div>
+        <div id="loadingClose" class="loading-msg">Загрузка данных...</div>
       </div>
     </div>
 
@@ -178,27 +169,21 @@
          ========================================= -->
     <div id="tab-open" class="tab-content">
       
-      <!-- Внутренние вкладки открытий -->
       <div class="open-tabs">
         <button class="open-tab-btn active" id="open-tab-today" onclick="switchOpenTab('today')">Сегодня</button>
         <button class="open-tab-btn" id="open-tab-archive" onclick="switchOpenTab('archive')">Архив по датам</button>
         <button class="open-tab-btn" id="open-tab-stats" onclick="switchOpenTab('stats')">Статистика</button>
       </div>
       
-      <!-- Панель управления открытиями -->
-      <div class="open-control-panel">
-        <span id="open-last-update">Последнее обновление: ожидание...</span>
+      <div class="filters">
+        <span id="open-last-update" style="color: #8e8e93; margin-right: auto;">Последнее обновление: ожидание...</span>
         
-        <div class="open-controls-group" id="open-date-controls">
-          <label for="open-history-date"><strong>Выберите дату:</strong></label>
+        <div id="open-date-controls" style="display: none; align-items: center; gap: 10px;">
           <input type="date" id="open-history-date" onchange="renderOpenDashboard()">
         </div>
 
-        <div class="open-controls-group" id="open-stats-controls">
-          <label for="open-stats-month"><strong>Месяц:</strong></label>
+        <div id="open-stats-controls" style="display: none; align-items: center; gap: 10px;">
           <input type="month" id="open-stats-month" onchange="renderOpenDashboard()">
-          
-          <label for="open-stats-shop"><strong>Магазин:</strong></label>
           <select id="open-stats-shop" onchange="renderOpenDashboard()">
             <option value="all">Все магазины</option>
             <option value="Медведково">Медведково</option>
@@ -216,21 +201,54 @@
           </select>
         </div>
 
-        <button class="open-update-btn" onclick="fetchOpenData()">Обновить данные</button>
+        <button class="update-btn" onclick="fetchOpenData()">🔄 Обновить</button>
       </div>
       
-      <!-- Контейнер для карточек / таблицы открытий -->
       <div id="open-dashboard-container" class="open-grid"></div>
-
     </div>
 
     <!-- =========================================
          ВКЛАДКА 3: API СТАТИСТИКА
          ========================================= -->
     <div id="tab-api" class="tab-content">
-      <div class="analytics-block">
-        <h3>Ожидание кода API</h3>
-        <p style="color: #8e8e93;">Сюда будет интегрирована статистика по API. Пришли мне код, и я добавлю его сюда!</p>
+      <div class="filters">
+        <input type="date" id="apiDate" onchange="fetchApiData()">
+        <button class="update-btn" onclick="fetchApiData()">🔄 Запросить из LiteBox</button>
+        <span id="api-last-update" style="color: #8e8e93; margin-left: auto;"></span>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-title">Сумма продаж (API)</div>
+          <div class="stat-value" id="apiSumSales">0 ₽</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Сумма возвратов (API)</div>
+          <div class="stat-value" style="color: #d32f2f;" id="apiSumReturns">0 ₽</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Чистая выручка (API)</div>
+          <div class="stat-value" style="color: #2e7d32;" id="apiSumNet">0 ₽</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="apiTable">
+          <thead>
+            <tr>
+              <th>Магазин</th>
+              <th>ИП / Организация</th>
+              <th>Продажи</th>
+              <th>Возвраты</th>
+              <th>Чистая выручка</th>
+              <th>Обновлено</th>
+            </tr>
+          </thead>
+          <tbody id="apiTableBody">
+            <tr><td colspan="6" style="text-align:center; padding: 20px;">Нажмите «Запросить из LiteBox» для загрузки данных</td></tr>
+          </tbody>
+        </table>
+        <div id="loadingApi" class="loading-msg">Идет опрос API LiteBox, подождите...</div>
       </div>
     </div>
 
@@ -240,7 +258,12 @@
        JAVASCRIPT ЛОГИКА
        ========================================= -->
   <script>
-    // --- 1. ОБЩИЕ ФУНКЦИИ ---
+    // --- 1. ССЫЛКИ НА GOOGLE APPS SCRIPT ---
+    const APPS_SCRIPT_URL_CLOSE = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
+    const APPS_SCRIPT_URL_OPEN = "https://script.google.com/macros/s/AKfycbxNQKdlCGzNCznsXEMR2zOM0_BX2cAuOk29mWYRO7XSrzVLPGKfkMtOey6iuPxrdm5P/exec"; 
+    const APPS_SCRIPT_URL_API = "https://script.google.com/macros/s/AKfycbyco1bT2lwTVeGhFxZUhIQ__0p5iHrBgSX8z7FoxhNqRsgfQImDvYOzG8Y_AHMOPLRS/exec"; 
+
+    // --- ОБЩИЕ ФУНКЦИИ ---
     function switchMainTab(tabId, btnElement) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.main-tabs button').forEach(b => b.classList.remove('active'));
@@ -253,22 +276,21 @@
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainCabinet').style.display = 'block';
         
-        // Установка дат по умолчанию для Закрытий
-        if (!document.getElementById('filterDate').value) {
-          const d = new Date();
-          document.getElementById('filterDate').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        }
+        const d = new Date();
+        const isoToday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         
-        // Запуск загрузки обеих баз
-        loadData();      // Загрузка Закрытий
-        fetchOpenData(); // Загрузка Открытий
+        if (!document.getElementById('filterDate').value) document.getElementById('filterDate').value = isoToday;
+        if (!document.getElementById('apiDate').value) document.getElementById('apiDate').value = isoToday;
+        
+        loadData();      
+        fetchOpenData(); 
+        // fetchApiData() запускается только по кнопке, чтобы не спамить API при входе
       } else {
         alert('Неверный PIN-код');
       }
     }
 
     // --- 2. ЛОГИКА "ЗАКРЫТИЕ СМЕНЫ" ---
-    const APPS_SCRIPT_URL_CLOSE = "https://script.google.com/macros/s/AKfycby6PWy1uVwpRPLc9CS_HkCGPyOBxY4pTiDaxTnzGx-41vNQecFcieEKCp4anq5p7bDh/exec";
     const ALL_SHOPS_CLOSE = ["Глобус Медведково", "Европолис Вход", "Европолис Окей", "Королёв", "Котельники", "Краснодар", "Лента", "Метрополис", "Мира", "Реутов", "Трудобелики", "Южный"];
     let allCloseReports = [];
     let closeShopsSet = new Set();
@@ -280,7 +302,8 @@
     }
 
     async function loadData() {
-      document.getElementById('loading').style.display = 'block';
+      document.getElementById('loadingClose').style.display = 'block';
+      document.getElementById('tableBody').innerHTML = '';
       try {
         const res = await fetch(APPS_SCRIPT_URL_CLOSE);
         const data = await res.json();
@@ -297,9 +320,7 @@
 
           return {
             fullDate: row[0], isoDate: isoDate, shop: row[1], seller: row[2],
-            revenue: parseMoney(row[3]),
-            cashless: parseMoney(row[4]),
-            cash: parseMoney(row[5]),
+            revenue: parseMoney(row[3]), cashless: parseMoney(row[4]), cash: parseMoney(row[5]),
             refunds: row[6], expenses: row[7],
             photoZ: row[8], photoTerm: row[9], photoKassa: row[10], photoEnv: row[11]
           };
@@ -313,12 +334,12 @@
         }
         renderData();
       } catch (err) {
-        document.getElementById('loading').innerText = 'Ошибка: ' + err.message;
+        document.getElementById('loadingClose').innerText = 'Ошибка: ' + err.message;
       }
     }
 
     function renderData() {
-      document.getElementById('loading').style.display = 'none';
+      document.getElementById('loadingClose').style.display = 'none';
       const filterDate = document.getElementById('filterDate').value;
       const filterShop = document.getElementById('filterShop').value;
       const tbody = document.getElementById('tableBody');
@@ -334,10 +355,7 @@
       });
 
       filtered.forEach(r => {
-        sumRev += r.revenue;
-        sumCashless += r.cashless;
-        sumCash += r.cash;
-
+        sumRev += r.revenue; sumCashless += r.cashless; sumCash += r.cash;
         if (!shopAverages[r.shop]) shopAverages[r.shop] = { sum: 0, count: 0 };
         shopAverages[r.shop].sum += r.revenue;
         shopAverages[r.shop].count += 1;
@@ -392,8 +410,6 @@
     }
 
     // --- 3. ЛОГИКА "ОТКРЫТИЕ СМЕНЫ" ---
-    const APPS_SCRIPT_URL_OPEN = "https://script.google.com/macros/s/AKfycbxNQKdlCGzNCznsXEMR2zOM0_BX2cAuOk29mWYRO7XSrzVLPGKfkMtOey6iuPxrdm5P/exec"; 
-    
     const openSchedule = {
       "Медведково": "08:00", "Трудобелики": "09:00", "Котельники": "09:00", "Королёв": "09:00",
       "Южный": "09:00", "Лента": "09:00", "Мира": "09:00", "Краснодар": "09:00",
@@ -403,25 +419,18 @@
     let allOpenData = []; 
     let currentOpenMode = 'today'; 
 
-    // Инициализация дат для Открытий
     const todayObjForInput = new Date();
-    const yyyy = todayObjForInput.getFullYear();
-    const mm = String(todayObjForInput.getMonth() + 1).padStart(2, '0');
-    const dd = String(todayObjForInput.getDate()).padStart(2, '0');
-    
-    document.getElementById('open-history-date').value = `${yyyy}-${mm}-${dd}`;
-    document.getElementById('open-stats-month').value = `${yyyy}-${mm}`;
+    document.getElementById('open-history-date').value = `${todayObjForInput.getFullYear()}-${String(todayObjForInput.getMonth() + 1).padStart(2, '0')}-${String(todayObjForInput.getDate()).padStart(2, '0')}`;
+    document.getElementById('open-stats-month').value = `${todayObjForInput.getFullYear()}-${String(todayObjForInput.getMonth() + 1).padStart(2, '0')}`;
 
     function switchOpenTab(mode) {
       currentOpenMode = mode;
-      
       document.getElementById('open-tab-today').classList.toggle('active', mode === 'today');
       document.getElementById('open-tab-archive').classList.toggle('active', mode === 'archive');
       document.getElementById('open-tab-stats').classList.toggle('active', mode === 'stats');
       
       document.getElementById('open-date-controls').style.display = (mode === 'archive') ? 'flex' : 'none';
       document.getElementById('open-stats-controls').style.display = (mode === 'stats') ? 'flex' : 'none';
-      
       renderOpenDashboard();
     }
 
@@ -430,10 +439,7 @@
       try {
         const response = await fetch(APPS_SCRIPT_URL_OPEN);
         allOpenData = await response.json(); 
-        
-        const now = new Date();
-        document.getElementById('open-last-update').innerText = "Синхронизировано: " + now.toLocaleTimeString('ru-RU');
-        
+        document.getElementById('open-last-update').innerText = "Синхронизировано: " + new Date().toLocaleTimeString('ru-RU');
         renderOpenDashboard();
       } catch (error) {
         document.getElementById('open-last-update').innerText = "Ошибка сети (Открытия).";
@@ -444,13 +450,10 @@
       const openDashboard = document.getElementById('open-dashboard-container');
       openDashboard.innerHTML = "";
 
-      // ТАБЛИЦА СТАТИСТИКИ ОТКРЫТИЙ
       if (currentOpenMode === 'stats') {
         openDashboard.className = "table-container"; 
-        
         const monthVal = document.getElementById('open-stats-month').value; 
         const shopVal = document.getElementById('open-stats-shop').value;
-        
         let filteredData = allOpenData;
         
         if (monthVal) {
@@ -458,71 +461,29 @@
           const suffix = `${parts[1]}.${parts[0]}`; 
           filteredData = filteredData.filter(row => row[0].endsWith(suffix));
         }
-        
-        if (shopVal !== 'all') {
-          filteredData = filteredData.filter(row => row[2] === shopVal);
-        }
+        if (shopVal !== 'all') filteredData = filteredData.filter(row => row[2] === shopVal);
 
         if (filteredData.length === 0) {
           openDashboard.innerHTML = "<div style='padding: 30px; text-align: center; color: #777;'>В этом месяце открытий пока не зафиксировано.</div>";
           return;
         }
 
-        let html = `
-          <table class="open-stats-table">
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Магазин</th>
-                <th>Сотрудник</th>
-                <th>Время открытия</th>
-                <th>Фото чека</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-
+        let html = `<table class="open-stats-table"><thead><tr><th>Дата</th><th>Магазин</th><th>Сотрудник</th><th>Время открытия</th><th>Фото чека</th></tr></thead><tbody>`;
         for (let i = filteredData.length - 1; i >= 0; i--) {
           const row = filteredData[i];
-          const dateStr = row[0];
-          const timeStr = row[1];
-          const shopName = row[2];
-          const photoUrl = row[4];
-          const employee = row[5] || "Не указан";
-          
-          const expectedTime = openSchedule[shopName];
-          let timeClass = "time-ok";
-          
-          if (timeStr && expectedTime && timeStr > expectedTime) {
-            timeClass = "time-late";
-          }
-
-          html += `
-            <tr>
-              <td>${dateStr}</td>
-              <td><b>${shopName}</b></td>
-              <td>${employee}</td>
-              <td class="${timeClass}">${timeStr} <span style="color:#999; font-size:11px; font-weight:normal;">(норма ${expectedTime})</span></td>
-              <td><button class="open-btn-primary open-btn-small" onclick="window.open('${photoUrl}', '_blank')">Смотреть</button></td>
-            </tr>
-          `;
+          const expectedTime = openSchedule[row[2]];
+          let timeClass = (row[1] && expectedTime && row[1] > expectedTime) ? "time-late" : "time-ok";
+          html += `<tr><td>${row[0]}</td><td><b>${row[2]}</b></td><td>${row[5] || "Не указан"}</td><td class="${timeClass}">${row[1]} <span style="color:#999; font-size:11px; font-weight:normal;">(норма ${expectedTime})</span></td><td><button class="open-btn-primary open-btn-small" onclick="window.open('${row[4]}', '_blank')">Смотреть</button></td></tr>`;
         }
-        
-        html += `</tbody></table>`;
-        openDashboard.innerHTML = html;
+        openDashboard.innerHTML = html + `</tbody></table>`;
         return;
       }
 
-      // КАРТОЧКИ (СЕГОДНЯ / АРХИВ)
       openDashboard.className = "open-grid"; 
-      
       let targetDateStr = "";
       if (currentOpenMode === 'today') {
-        const todayObj = new Date();
-        const day = String(todayObj.getDate()).padStart(2, '0');
-        const month = String(todayObj.getMonth() + 1).padStart(2, '0');
-        const year = todayObj.getFullYear();
-        targetDateStr = `${day}.${month}.${year}`;
+        const d = new Date();
+        targetDateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
       } else {
         const inputVal = document.getElementById('open-history-date').value;
         if (!inputVal) return; 
@@ -531,48 +492,82 @@
       }
       
       const targetData = allOpenData.filter(row => row[0] === targetDateStr);
-      
       Object.keys(openSchedule).forEach(shop => {
         const shopLog = targetData.reverse().find(row => row[2] === shop); 
-        
         const card = document.createElement('div');
         card.className = "open-card" + (shopLog ? " is-open" : "");
         
-        let statusHtml = "";
-        let detailsHtml = "";
-        let btnHtml = "";
-        
+        let statusHtml = "", detailsHtml = "", btnHtml = "";
         if (shopLog) {
           statusHtml = `<div class="open-card-status">☑️ Открыт в ${shopLog[1]}</div>`;
           detailsHtml = `Сотрудник: <b>${shopLog[5]}</b><br>По графику: ${openSchedule[shop]}`;
           btnHtml = `<button class="open-btn-primary" onclick="window.open('${shopLog[4]}', '_blank')">Посмотреть чек</button>`;
         } else {
-          if (currentOpenMode === 'today') {
-            statusHtml = `<div class="open-card-status closed">❌ Ждем открытия</div>`;
-            detailsHtml = `Сотрудник: —<br>По графику: ${openSchedule[shop]}`;
-          } else {
-            statusHtml = `<div class="open-card-status archive-closed">⚠️ Нет данных</div>`;
-            detailsHtml = `Открытие не зафиксировано<br>По графику: ${openSchedule[shop]}`;
-          }
+          statusHtml = currentOpenMode === 'today' ? `<div class="open-card-status closed">❌ Ждем открытия</div>` : `<div class="open-card-status archive-closed">⚠️ Нет данных</div>`;
+          detailsHtml = currentOpenMode === 'today' ? `Сотрудник: —<br>По графику: ${openSchedule[shop]}` : `Открытие не зафиксировано<br>По графику: ${openSchedule[shop]}`;
           btnHtml = `<button class="open-btn-primary" disabled>Чек отсутствует</button>`;
         }
-        
-        card.innerHTML = `
-          <div class="open-card-title">${shop}</div>
-          ${statusHtml}
-          <div class="open-card-details">${detailsHtml}</div>
-          ${btnHtml}
-        `;
+        card.innerHTML = `<div class="open-card-title">${shop}</div>${statusHtml}<div class="open-card-details">${detailsHtml}</div>${btnHtml}`;
         openDashboard.appendChild(card);
       });
     }
 
-    // Автообновление данных по Открытиям раз в 2 минуты
-    setInterval(() => {
-      if(document.getElementById('mainCabinet').style.display === 'block') {
-         fetchOpenData();
+    // --- 4. ЛОГИКА "API LITEBOX" ---
+    async function fetchApiData() {
+      document.getElementById('apiTableBody').innerHTML = '';
+      document.getElementById('loadingApi').style.display = 'block';
+      document.getElementById('api-last-update').innerText = "Загрузка...";
+      
+      const dateVal = document.getElementById('apiDate').value;
+      
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL_API}?date=${dateVal}`);
+        const apiData = await res.json();
+        
+        document.getElementById('loadingApi').style.display = 'none';
+        
+        const tbody = document.getElementById('apiTableBody');
+        let totalSales = 0, totalReturns = 0, totalNet = 0;
+        
+        if (!apiData || apiData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">За этот день данных нет</td></tr>';
+          document.getElementById('api-last-update').innerText = "Обновлено: " + new Date().toLocaleTimeString('ru-RU');
+          return;
+        }
+
+        apiData.forEach(row => {
+          let sales = parseFloat(row["Продажи (руб.)"]) || 0;
+          let returns = parseFloat(row["Возвраты (руб.)"]) || 0;
+          let net = parseFloat(row["Чистая выручка (руб.)"]) || 0;
+          
+          totalSales += sales;
+          totalReturns += returns;
+          totalNet += net;
+
+          tbody.innerHTML += `
+            <tr>
+              <td style="font-weight:600;">${row["Магазин"]}</td>
+              <td style="color:#8e8e93;">${row["Организация"]}</td>
+              <td style="font-weight:600;">${sales.toLocaleString('ru-RU')} ₽</td>
+              <td style="color:#d32f2f;">${returns.toLocaleString('ru-RU')} ₽</td>
+              <td style="color:#2e7d32; font-weight:600;">${net.toLocaleString('ru-RU')} ₽</td>
+              <td style="color:#8e8e93; font-size:12px;">${row["Обновлено"]}</td>
+            </tr>
+          `;
+        });
+        
+        document.getElementById('apiSumSales').innerText = totalSales.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('apiSumReturns').innerText = totalReturns.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('apiSumNet').innerText = totalNet.toLocaleString('ru-RU') + ' ₽';
+        
+        document.getElementById('api-last-update').innerText = "Данные на " + new Date().toLocaleTimeString('ru-RU');
+
+      } catch (err) {
+        document.getElementById('loadingApi').style.display = 'none';
+        document.getElementById('apiTableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #d32f2f;">Ошибка загрузки API: ${err.message}</td></tr>`;
+        document.getElementById('api-last-update').innerText = "Ошибка загрузки";
       }
-    }, 120000);
+    }
 
   </script>
 </body>
