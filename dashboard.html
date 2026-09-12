@@ -28,7 +28,7 @@
        ОБЩИЕ СТИЛИ (ФИЛЬТРЫ, СТАТИСТИКА, ТАБЛИЦЫ)
        ========================================= */
     .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    select, input[type="date"], input[type="month"] { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
+    select, input[type="date"], input[type="month"], input[type="text"].filter-input { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; min-width: 200px; outline: none; }
     .update-btn { padding: 10px 15px; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; transition: 0.2s; }
     .update-btn:hover { background: #f0f0f0; }
     
@@ -111,7 +111,9 @@
          ========================================= -->
     <div id="tab-close" class="tab-content active">
       <div class="filters">
-        <input type="date" id="filterDate" onchange="renderData()">
+        <input type="date" id="filterDateStart" onchange="renderData()">
+        <span style="color: #8e8e93; font-weight: 600;">—</span>
+        <input type="date" id="filterDateEnd" onchange="renderData()">
         <select id="filterShop" onchange="renderData()">
           <option value="ALL">Все магазины</option>
         </select>
@@ -182,7 +184,7 @@
           <input type="date" id="open-history-date" onchange="renderOpenDashboard()">
         </div>
 
-        <div id="open-stats-controls" style="display: none; align-items: center; gap: 10px;">
+        <div id="open-stats-controls" style="display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
           <input type="month" id="open-stats-month" onchange="renderOpenDashboard()">
           <select id="open-stats-shop" onchange="renderOpenDashboard()">
             <option value="all">Все магазины</option>
@@ -199,6 +201,7 @@
             <option value="Европолис Вход">Европолис Вход</option>
             <option value="Европолис Окей">Европолис Окей</option>
           </select>
+          <input type="text" id="open-stats-employee" class="filter-input" placeholder="Имя сотрудника" oninput="renderOpenDashboard()">
         </div>
 
         <button class="update-btn" onclick="fetchOpenData()">🔄 Обновить</button>
@@ -279,12 +282,12 @@
         const d = new Date();
         const isoToday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         
-        if (!document.getElementById('filterDate').value) document.getElementById('filterDate').value = isoToday;
+        if (!document.getElementById('filterDateStart').value) document.getElementById('filterDateStart').value = isoToday;
+        if (!document.getElementById('filterDateEnd').value) document.getElementById('filterDateEnd').value = isoToday;
         if (!document.getElementById('apiDate').value) document.getElementById('apiDate').value = isoToday;
         
         loadData();      
         fetchOpenData(); 
-        // fetchApiData() запускается только по кнопке, чтобы не спамить API при входе
       } else {
         alert('Неверный PIN-код');
       }
@@ -340,7 +343,8 @@
 
     function renderData() {
       document.getElementById('loadingClose').style.display = 'none';
-      const filterDate = document.getElementById('filterDate').value;
+      const filterStart = document.getElementById('filterDateStart').value;
+      const filterEnd = document.getElementById('filterDateEnd').value;
       const filterShop = document.getElementById('filterShop').value;
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
@@ -349,7 +353,8 @@
       let shopAverages = {};
 
       const filtered = allCloseReports.filter(r => {
-        if (filterDate && r.isoDate !== filterDate) return false;
+        if (filterStart && r.isoDate < filterStart) return false;
+        if (filterEnd && r.isoDate > filterEnd) return false;
         if (filterShop !== 'ALL' && r.shop !== filterShop) return false;
         return true;
       });
@@ -394,10 +399,11 @@
         grid.innerHTML += `<div class="avg-card"><div class="avg-name">${shop}</div><div class="avg-num">${Math.round(avg).toLocaleString('ru-RU')} ₽</div></div>`;
       }
 
-      if (filterDate) {
+      // Показываем статус сдачи ТОЛЬКО если выбран один конкретный день
+      if (filterStart && filterStart === filterEnd) {
         document.getElementById('completionStatus').style.display = 'block';
-        document.getElementById('statusDateLabel').innerText = filterDate.split('-').reverse().join('.');
-        const shopsForDate = new Set(allCloseReports.filter(r => r.isoDate === filterDate).map(r => r.shop));
+        document.getElementById('statusDateLabel').innerText = filterStart.split('-').reverse().join('.');
+        const shopsForDate = new Set(allCloseReports.filter(r => r.isoDate === filterStart).map(r => r.shop));
         const submittedArr = Array.from(shopsForDate).filter(shop => ALL_SHOPS_CLOSE.includes(shop));
         const pendingArr = ALL_SHOPS_CLOSE.filter(shop => !shopsForDate.has(shop));
         document.getElementById('submittedCount').innerText = submittedArr.length;
@@ -454,6 +460,8 @@
         openDashboard.className = "table-container"; 
         const monthVal = document.getElementById('open-stats-month').value; 
         const shopVal = document.getElementById('open-stats-shop').value;
+        const employeeVal = document.getElementById('open-stats-employee').value.toLowerCase().trim();
+
         let filteredData = allOpenData;
         
         if (monthVal) {
@@ -462,9 +470,10 @@
           filteredData = filteredData.filter(row => row[0].endsWith(suffix));
         }
         if (shopVal !== 'all') filteredData = filteredData.filter(row => row[2] === shopVal);
+        if (employeeVal) filteredData = filteredData.filter(row => (row[5] || "").toLowerCase().includes(employeeVal));
 
         if (filteredData.length === 0) {
-          openDashboard.innerHTML = "<div style='padding: 30px; text-align: center; color: #777;'>В этом месяце открытий пока не зафиксировано.</div>";
+          openDashboard.innerHTML = "<div style='padding: 30px; text-align: center; color: #777;'>По выбранным фильтрам данных не найдено.</div>";
           return;
         }
 
