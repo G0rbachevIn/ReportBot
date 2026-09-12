@@ -114,6 +114,10 @@
          ========================================= -->
     <div id="tab-close" class="tab-content active">
       <div class="filters">
+        <button class="update-btn" style="color: var(--primary); font-size: 14px;" onclick="quickDate('today')">Сегодня</button>
+        <button class="update-btn" style="color: var(--primary); font-size: 14px;" onclick="quickDate('yesterday')">Вчера</button>
+        <span style="border-left: 1px solid var(--border); height: 20px; margin: 0 5px;"></span>
+        
         <input type="date" id="filterDateStart" onchange="renderData()">
         <span style="color: #8e8e93; font-weight: 600;">—</span>
         <input type="date" id="filterDateEnd" onchange="renderData()">
@@ -283,18 +287,28 @@
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainCabinet').style.display = 'block';
         
-        const d = new Date();
-        const isoToday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        
-        if (!document.getElementById('filterDateStart').value) document.getElementById('filterDateStart').value = isoToday;
-        if (!document.getElementById('filterDateEnd').value) document.getElementById('filterDateEnd').value = isoToday;
-        if (!document.getElementById('apiDate').value) document.getElementById('apiDate').value = isoToday;
+        quickDate('today', false); // Устанавливаем даты на сегодня без авто-рендера
         
         loadData();      
         fetchOpenData(); 
       } else {
         alert('Неверный PIN-код');
       }
+    }
+
+    // --- ФУНКЦИЯ БЫСТРЫХ ДАТ (СЕГОДНЯ / ВЧЕРА) ---
+    function quickDate(type, doRender = true) {
+      const d = new Date();
+      if (type === 'yesterday') {
+        d.setDate(d.getDate() - 1);
+      }
+      const isoDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      
+      document.getElementById('filterDateStart').value = isoDate;
+      document.getElementById('filterDateEnd').value = isoDate;
+      if (document.getElementById('apiDate')) document.getElementById('apiDate').value = isoDate;
+      
+      if (doRender) renderData();
     }
 
     // --- 2. ЛОГИКА "ЗАКРЫТИЕ СМЕНЫ" ---
