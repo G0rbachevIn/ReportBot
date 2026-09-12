@@ -53,6 +53,9 @@
     .links a { display: inline-block; margin-right: 8px; color: var(--primary); text-decoration: none; font-weight: 500; font-size: 13px; background: #e0f0ff; padding: 4px 8px; border-radius: 6px; }
     .links a:hover { background: #cce4ff; }
     .loading-msg { text-align: center; padding: 40px; font-size: 18px; color: #8e8e93; display: none; }
+    
+    /* Бейджи для расходов и возвратов */
+    .badge { background: #ffe5e5; color: #d93025; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; display: inline-block; margin-bottom: 4px; }
 
     /* Статусы сдачи (Вкладка 1) */
     .completion-status { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
@@ -157,6 +160,7 @@
               <th>Выручка</th>
               <th>Безнал</th>
               <th>Нал</th>
+              <th>Расходы / Возвраты</th>
               <th>Фото чеков</th>
             </tr>
           </thead>
@@ -365,6 +369,15 @@
         shopAverages[r.shop].sum += r.revenue;
         shopAverages[r.shop].count += 1;
 
+        // Блок с Расходами и Возвратами
+        let extraHtml = '';
+        if (r.expenses && r.expenses !== 'Нет') {
+          extraHtml += `<div class="badge">Расход: ${r.expenses}</div><br>`;
+        }
+        if (r.refunds && r.refunds !== 'Нет') {
+          extraHtml += `<div class="badge" style="background:#fff3e0; color:#e65100;">Возврат: ${r.refunds}</div>`;
+        }
+
         let linksHtml = '<div class="links">';
         if (r.photoZ) linksHtml += `<a href="${r.photoZ}" target="_blank">Z-отчет</a>`;
         if (r.photoTerm) linksHtml += `<a href="${r.photoTerm}" target="_blank">Терминал</a>`;
@@ -379,6 +392,7 @@
             <td style="font-weight:600;">${Math.round(r.revenue).toLocaleString('ru-RU')} ₽</td>
             <td>${Math.round(r.cashless).toLocaleString('ru-RU')} ₽</td>
             <td>${Math.round(r.cash).toLocaleString('ru-RU')} ₽</td>
+            <td>${extraHtml || '-'}</td>
             <td>${linksHtml}</td>
           </tr>`;
       });
@@ -390,7 +404,7 @@
       let avgTotal = filtered.length > 0 ? sumRev / filtered.length : 0;
       document.getElementById('avgTotalRevenue').innerText = `Средняя: ${Math.round(avgTotal).toLocaleString('ru-RU')} ₽`;
       
-      if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Нет данных</td></tr>';
+      if (filtered.length === 0) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">Нет данных</td></tr>';
 
       const grid = document.getElementById('shopAvgGrid');
       grid.innerHTML = '';
